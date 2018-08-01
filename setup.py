@@ -8,7 +8,7 @@ setup(
     version='1.0a0',
     packages=[],
     scripts=['tproc.py'],
-    description='A small yet powerful textual processor',
+    description='A small yet powerful text processor',
     author='Ivan Kosarev',
     author_email='ivan@kosarev.info',
     license='MIT',
