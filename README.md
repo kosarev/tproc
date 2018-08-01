@@ -39,8 +39,8 @@ body text. The names in curly braces are replaced with the body
 of the corresponding definition.
 
 Note that tproc only expands input on request, and not as it
-reads and processes the definitions. For this reason, the
-definitions may come in any order that fits best for your needs.
+reads and processes the definitions. Because of this, the
+definitions may come in any order as seems best for your needs.
 
 Whitespace just before and just after definition bodies is
 stripped, so all the three definitions in the example produce
