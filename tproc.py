@@ -305,7 +305,7 @@ class Processor:
                 yield chunk
         else:
             # Collect fully expanded field and format it as requested.
-            format_spec = self.stringify_tokens(format_spec)
+            format_spec = self._stringify_tokens(format_spec)
             value = ''.join([x for x in value])
             value = '{0:{1}}'.format(value, format_spec)
             yield value

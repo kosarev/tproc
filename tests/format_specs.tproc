@@ -1,0 +1,9 @@
+
+@title
+ESIO TROT
+
+@main
+{title:-^15}
+
+@expected
+---ESIO TROT---

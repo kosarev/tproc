@@ -161,6 +161,29 @@ To guarantee reproducible results invocations of replacement
 fields are always processed in the left-to-right order.
 
 
+## Format specifiers
+
+In addition to value expressions, replacement fields may contain
+format specifiers:
+
+```python
+@title
+ESIO TROT
+
+@main
+{title:-^15}
+```
+
+Generates:
+
+```
+---ESIO TROT---
+```
+
+As you may guess, the syntax of format specifiers is the same as
+for the lovely `format()` function.
+
+
 ## API
 
 ### tproc.Processor
