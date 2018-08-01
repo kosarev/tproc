@@ -50,20 +50,20 @@ class _TokenBase(object):
 # Class for delimiters, such as curly braces.
 class _DelimiterToken(_TokenBase):
     def __init__(self, literal):
-        super().__init__('delimiter', literal)
+        super(_DelimiterToken, self).__init__('delimiter', literal)
 
 
 # Represents tokens that should be treated as literal data. The content may or
 # may not be a string.
 class _LiteralToken(_TokenBase):
     def __init__(self, content):
-        super().__init__('literal', content)
+        super(_LiteralToken, self).__init__('literal', content)
 
 
 # Designates invocations of fields to expand and replace.
 class _ReplacementField(_TokenBase):
     def __init__(self, content):
-        super().__init__('field', content)
+        super(_ReplacementField, self).__init__('field', content)
 
 
 # The type of the processor instances.
@@ -104,7 +104,7 @@ class Processor:
     # Reads a single line.
     def _read_line(self, input):
         for chunk in input:
-            chunk = chunk.split('\n', maxsplit=1)
+            chunk = chunk.split('\n', 1)  # maxsplit=1
             yield chunk[0]
 
             if len(chunk) > 1:
