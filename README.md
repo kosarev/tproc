@@ -184,6 +184,61 @@ As you may guess, the syntax of format specifiers is the same as
 for the lovely `format()` function.
 
 
+## Passing data to generators
+
+In replacement fields, portions of data delimited with colons may
+follow (possibly empty) format specifiers. Each such piece of
+data will then be passed as an argument to the generator. For
+example:
+
+```python
+@
+def section(title, body):
+    yield '<section>'
+    yield '<title>'
+    for chunk in title:
+        yield chunk
+    yield '</title>'
+    yield '<body>'
+    for chunk in body:
+        yield chunk
+    yield '</body>'
+    yield '</section>'
+
+@main
+{section::NAME:tproc - A text processor}
+{section::SYNOPSIS:tproc [-e DEFINITION] [infile] [outfile]}
+```
+
+This gives:
+
+```
+<section><title>NAME</title><body>tproc - A text processor</body></section>
+<section><title>SYNOPSIS</title><body>tproc [-e DEFINITION] [infile] [outfile]</body></section>
+```
+
+And of course such arguments can nest and each of them gets
+expanded before passing to the generator:
+
+```python
+@
+def p(body):
+    yield '<p>'
+    for chunk in body:
+        yield chunk
+    yield '</p>'
+
+def i(body):
+    yield '<i>'
+    for chunk in body:
+        yield chunk
+    yield '</i>'
+
+@main
+{p::It is {i::crucial} to support nested arguments.}
+```
+
+
 ## API
 
 ### tproc.Processor

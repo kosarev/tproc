@@ -1,0 +1,19 @@
+
+@
+def p(body):
+    yield '<p>'
+    for chunk in body:
+        yield chunk
+    yield '</p>'
+
+def i(body):
+    yield '<i>'
+    for chunk in body:
+        yield chunk
+    yield '</i>'
+
+@main
+{p::It is {i::crucial} to support nested arguments.}
+
+@expected
+<p>It is <i>crucial</i> to support nested arguments.</p>

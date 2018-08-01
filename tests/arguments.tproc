@@ -1,0 +1,21 @@
+
+@
+def section(title, body):
+    yield '<section>'
+    yield '<title>'
+    for chunk in title:
+        yield chunk
+    yield '</title>'
+    yield '<body>'
+    for chunk in body:
+        yield chunk
+    yield '</body>'
+    yield '</section>'
+
+@main
+{section::NAME:tproc}
+{section::SYNOPSIS:tproc [-e DEFINITION] [input_file] [output_file]}
+
+@expected
+<section><title>NAME</title><body>tproc</body></section>
+<section><title>SYNOPSIS</title><body>tproc [-e DEFINITION] [input_file] [output_file]</body></section>
