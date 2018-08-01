@@ -73,7 +73,8 @@ class Processor:
         self._definition_prefix = '@'
 
         # Delimiter tokens we recognize in inputs.
-        self._delimiters = {x: _DelimiterToken(x) for x in ['{', '}', ':']}
+        self._delimiters = dict((x, _DelimiterToken(x))
+                                    for x in ['{', '}', ':'])
 
         # Escape sequences start with this character.
         self._escape_char = '\\'
