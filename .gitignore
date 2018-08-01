@@ -1,0 +1,6 @@
+__pycache__
+dist
+tests/__pycache__
+tests/*.pyc
+tproc.egg-info
+*.pyc
