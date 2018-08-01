@@ -194,7 +194,7 @@ class Processor:
                 continue
 
             repeat = False
-            for delim in set(self._delimiters).union({self._escape_char}):
+            for delim in set(self._delimiters) | set([self._escape_char]):
                 segments = chunk.partition(delim)
                 if segments[1] and (segments[0] or segments[2]):
                     input.push_back(*segments)
