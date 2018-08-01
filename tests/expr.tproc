@@ -1,0 +1,9 @@
+
+@
+import time
+
+@main
+{time.strftime('%Y')[\:2]}
+
+@expected
+20

@@ -1,0 +1,14 @@
+
+@
+counter = 0
+
+def count():
+    global counter
+    yield '%d' % counter
+    counter += 1
+
+@main
+{count} {count} {count}
+
+@expected
+0 1 2

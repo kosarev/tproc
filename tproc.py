@@ -291,7 +291,7 @@ class Processor:
 
         if callable(value):
             value = value(*args)
-        elif not isinstance(value, self.generator_type):
+        elif not isinstance(value, types.GeneratorType):
             value = (x for x in [value])
 
         # Expand.

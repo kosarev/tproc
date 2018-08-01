@@ -100,9 +100,70 @@ Custom generators can yield the whole piece of data at once or
 generate it by chunks of arbitrary size.
 
 
+## Replacement fields
+
+Replacement fields are portions of text surrounded with curly
+braces that tproc replaces with some other content during
+expansion process. For example:
+
+```python
+@email
+info@{domain}
+
+@domain
+example.com
+```
+
+Such simplest replacement fields contain the name of a text
+definition or of a custom generator (which is the same). But they
+in fact can be arbitrary expressions:
+
+```python
+@
+import time
+
+@main
+Happy {time.strftime('%A')}!
+```
+
+On Fridays this results into:
+
+```
+Happy Friday!
+```
+
+Note that the value of a replacement field is evaluated every
+time the field is expanded, and it is expanded every time tproc
+encounters its invocation, so such values are never cached. This
+allows generators to produce different content for different
+invocations, like in this example:
+
+```python
+@
+counter = 0
+
+def count():
+    global counter
+    yield '%d' % counter
+    counter += 1
+
+@main
+{count} {count} {count}
+```
+
+Output:
+
+```
+0 1 2
+```
+
+To guarantee reproducible results invocations of replacement
+fields are always processed in the left-to-right order.
+
+
 ## API
 
-### Processor
+### tproc.Processor
 
 * `Processor.expand(input)`
 
