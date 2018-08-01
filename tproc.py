@@ -178,7 +178,7 @@ class Processor:
             if not isinstance(chunk, str):
                 assert not escaped  # TODO
 
-                if not isinstance(chunk, token_base):
+                if not isinstance(chunk, _TokenBase):
                     chunk = _LiteralToken(chunk)
 
                 yield chunk
