@@ -1,0 +1,15 @@
+
+@
+def hello():
+    yield 'Hello {'
+    yield 'world'
+    yield '}'
+
+@world
+World!
+
+@main
+{hello}
+
+@expected
+Hello World!
