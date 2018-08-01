@@ -1,0 +1,14 @@
+
+asdf
+
+@hello
+Hello {world}
+
+@world
+World!
+
+@main
+{hello}
+
+@expected
+Hello World!

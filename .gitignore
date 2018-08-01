@@ -1,3 +1,4 @@
+.eggs
 __pycache__
 dist
 tests/__pycache__

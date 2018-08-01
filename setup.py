@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from setuptools import setup
+import setuptools
 
-setup(
+setuptools.setup(
     name='tproc',
     version='1.0a0',
     packages=[],
     scripts=['tproc.py'],
+    install_requires=[
+        'argparse',
+    ],
     description='A small yet powerful text processor',
     author='Ivan Kosarev',
     author_email='ivan@kosarev.info',
