@@ -91,7 +91,7 @@ class Processor:
 
         # We also want additional escape sequences for all the delimiter
         # tokens.
-        self._escapes.update({x: x for x in self._delimiters})
+        self._escapes.update(dict((x, x) for x in self._delimiters))
 
         # The namespace where the sources to process define their entities.
         # Here we inject a predefined name through which sources can access
