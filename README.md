@@ -251,7 +251,9 @@ do that.
 Escape sequences start with slash (`\`) followed by the character
 to escape. For example:
 
-```python
+<!-- In 'python' mode this block highlights 'wrong' escape
+     sequences. -->
+```
 @
 @main
 This example:
