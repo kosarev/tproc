@@ -40,11 +40,11 @@ class _Stream(object):
 # Base class for all tokens.
 class _TokenBase(object):
     def __init__(self, kind, content):
-        self.kind = kind
+        self._kind = kind
         self.content = content
 
     def __repr__(self):
-        return '<%s %r>' % (self.kind, self.content)
+        return '<%s %r>' % (self._kind, self.content)
 
 
 # Class for delimiters, such as curly braces.
@@ -55,9 +55,9 @@ class _DelimiterToken(_TokenBase):
 
 # Represents tokens that should be treated as literal data. The content may or
 # may not be a string.
-class _LiteralToken(_TokenBase):
+class LiteralToken(_TokenBase):
     def __init__(self, content):
-        super(_LiteralToken, self).__init__('literal', content)
+        super(LiteralToken, self).__init__('literal', content)
 
 
 # Designates invocations of fields to expand and replace.
@@ -184,7 +184,7 @@ class Processor:
                 assert not escaped  # TODO
 
                 if not isinstance(chunk, _TokenBase):
-                    chunk = _LiteralToken(chunk)
+                    chunk = LiteralToken(chunk)
 
                 yield chunk
                 continue
@@ -192,7 +192,7 @@ class Processor:
             if escaped:
                 c = chunk[0]
                 assert c in self._escapes, c  # TODO: error: Unknown escape sequence.
-                yield _LiteralToken(self._escapes[c])
+                yield LiteralToken(self._escapes[c])
                 escaped = False
 
                 input.push_back(chunk[1:])
@@ -215,7 +215,7 @@ class Processor:
 
             token = self._delimiters.get(chunk, None)
             if not token:
-                token = _LiteralToken(chunk)
+                token = LiteralToken(chunk)
 
             yield token
 
@@ -242,7 +242,7 @@ class Processor:
 
             if balance == 0:
                 if isinstance(token, _DelimiterToken):
-                    token = _LiteralToken(token.content)
+                    token = LiteralToken(token.content)
 
                 yield token
                 continue
@@ -321,7 +321,7 @@ class Processor:
     def _expand_tokens(self, input):
         input = _Stream(input)
         for token in self._format_parser(input):
-            if isinstance(token, _LiteralToken):
+            if isinstance(token, LiteralToken):
                 yield token
                 continue
 
@@ -334,7 +334,7 @@ class Processor:
         for chunk in self._expand_tokens(input):
             if isinstance(chunk, _TokenBase):
                 # All other tokens shall be consumed at this point.
-                assert isinstance(chunk, _LiteralToken), chunk
+                assert isinstance(chunk, LiteralToken), chunk
                 chunk = chunk.content
 
             yield chunk

@@ -282,6 +282,91 @@ data, tproc also supports the standard C escape sequences:
 `\\` `\'` `\"` `\a` `\b` `\f` `\n` `\r` `\t` `\v`
 
 
+## Tokens
+
+Consider this:
+
+```python
+@main
+'{echo:: {echo:: \: } }'
+
+@
+def echo(content):
+    return content
+```
+
+The code seems obvious: the inner `echo` invocation gets expanded
+into a colon character surrounded by spaces, which then becomes
+the argument of the outer invocation that too replicates the
+colon adding some more spaces around it, resulting in:
+
+```
+'  :  '
+```
+
+However, if the inner `echo` gets its argument containing the
+colon in its literal de-escaped form, which is so, then why that
+colon character doesn't work as an argument delimiter when it's
+passed to the outer `echo`?
+
+The answer is that before an expansion takes place, all
+characters that form the sequence to expand are converted into
+tokens. Curly braces designating bounds of replacement fields and
+colons separating format specifiers and arguments within them
+become delimiter tokens and all other data becomes literal
+tokens. Being parsed, tokens preserve their meaning until the
+very end of the expansion process, so once the escaped colon
+character in the example above becomes part of a literal token,
+it will always be considered as part of text, and not as a
+delimiter.
+
+Let's change the example a bit to see what the generators
+actually get:
+
+```python
+@main
+{eat:: '{outer:: {inner:: \: } }' }
+
+@
+inner_chunks = []
+outer_chunks = []
+
+def inner(content):
+    for chunk in content:
+        inner_chunks.append(chunk)
+        yield chunk
+
+def outer(content):
+    for chunk in content:
+        outer_chunks.append(chunk)
+        yield chunk
+
+def eat(content):
+    for chunk in content:
+        pass
+
+    print('inner: %r' % inner_chunks)
+    print('outer: %r' % outer_chunks)
+    yield ''
+```
+
+The output:
+
+```
+inner: [<literal ' '>, <literal ':'>, <literal ' '>]
+outer: [<literal ' '>, <literal ' '>, <literal ':'>, <literal ' '>, <literal ' '>]
+```
+
+For both the inner and outer invocations the content is a
+sequence of literal tokens containing spaces and colon
+characters. Curly braces and colons that work as delimiters are
+consumed and processed by tproc accordingly to their meaning.
+
+In terms of code, literal tokens are instances of class
+`LiteralToken` that have a public member `.content` that stores
+the literal as a string.
+
+
 ## API
 
 ### tproc.Processor
