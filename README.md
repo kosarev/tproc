@@ -432,6 +432,36 @@ in the resulting output in their stringized form:
 # [11, 11, 11, 11, 11]
 ```
 
+Using nested replacements lists that expand into non-text data
+makes it possible to translate custom markups directly into
+Python data structures. For example:
+
+```python
+@main
+{section::TITLE:
+{p::
+First paragraph.}
+{p::
+Second paragaph.}
+}
+
+@
+def collect(tokens):
+    return [x.content for x in tokens]
+
+def p(body):
+    yield ('p', collect(body))
+
+def section(title, body):
+    yield ('section', collect(title), collect(body))
+```
+
+Results in:
+
+```
+('section', ['TITLE'], ['\n', ('p', ['\nFirst paragraph.']), '\n', ('p', ['\nSecond paragaph.']), '\n'])
+```
+
 
 ## Namespaces and processor objects
 

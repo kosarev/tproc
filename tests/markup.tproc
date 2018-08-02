@@ -1,0 +1,25 @@
+
+@main
+{section::TITLE:
+{p::
+First paragraph.}
+{p::
+Second paragaph.}
+}
+
+@
+def collect(tokens):
+    return [x.content for x in tokens]
+
+def p(body):
+    yield ('p', collect(body))
+
+def section(title, body):
+    yield ('section', collect(title), collect(body))
+
+@
+def expected():
+    yield ('section',
+               ['TITLE'],
+               ['\n', ('p', ['\nFirst paragraph.']), '\n',
+                ('p', ['\nSecond paragaph.']), '\n'])
