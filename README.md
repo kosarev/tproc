@@ -369,6 +369,67 @@ In terms of code, literal tokens are instances of class
 the literal as a string.
 
 
+# Generation of non-text data
+
+We we already said, the value of a replacement field can be any
+expression. If it evaluates to something callable, it is called
+and the returned value is considered as the field value. Then, if
+the value is a generator, it becomes the source of the value
+chunks. Any other values are converted into literal tokens with
+the `.content` field storing the original value.
+
+Here's how it works:
+
+```python
+@content
+{55} {[5, 7, 9]} {tuple(range(3))} {lambda\: [(yield [11] * 5)]} {'{at}'}
+
+@main
+{dump::{content}}
+
+@at
+\@
+
+@
+def dump(content):
+    for chunk in content:
+        print('%r' % chunk)
+
+    yield ''
+```
+
+The values of the replacement fields in `content` are evaluated
+and expanded, and then passed to `dump` as a sequence of literal
+tokens:
+
+```
+<literal 55>
+<literal ' '>
+<literal [5, 7, 9]>
+<literal ' '>
+<literal (0, 1, 2)>
+<literal ' '>
+<literal [11, 11, 11, 11, 11]>
+<literal ' '>
+<literal '@'>
+```
+
+On full expansion, tokens are converted back to their literals and appear
+in the resulting output in their stringized form:
+
+```python
+@main
+{55} {[5, 7, 9]} {tuple(range(3))} {lambda\: [(yield [11] * 5)]} {'{at}'}
+
+@at
+\@
+```
+
+```
+55 [5, 7, 9] (0, 1, 2) [11, 11, 11, 11, 11] @
+```
+
+
 ## API
 
 ### tproc.Processor

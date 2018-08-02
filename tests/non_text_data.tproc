@@ -1,0 +1,18 @@
+
+@main
+{55} {[5, 7, 9]} {tuple(range(3))} {lambda\: [(yield [11] * 5)]} {'{at}'}
+
+@at
+\@
+
+@
+def expected():
+    yield 55
+    yield ' '
+    yield [5, 7, 9]
+    yield ' '
+    yield (0, 1, 2)
+    yield ' '
+    yield [11, 11, 11, 11, 11]
+    yield ' '
+    yield '@'

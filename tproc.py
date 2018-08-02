@@ -279,7 +279,7 @@ class Processor:
 
     # Turns a given sequence of tokens into a string.
     def _stringify_tokens(self, tokens):
-        return ''.join(['%s' % x.content for x in tokens])
+        return ''.join([str(x.content) for x in tokens])
 
     # Takes a sequence of tokens constituting a replacement field and expands
     # it.
@@ -371,7 +371,7 @@ def main():
     # Expand the definition.
     output = args.output_file
     for chunk in p.expand_field(args.expand):
-        output.write(chunk)
+        output.write(str(chunk))
 
 
 if __name__ == '__main__':
