@@ -421,7 +421,7 @@ in the resulting output in their stringized form:
 
 <!-- In 'python' mode this block highlights 'wrong' escape
      sequences. -->
-```pycon
+```python console
 @main
 {55} {[5, 7, 9]} {tuple(range(3))} {lambda\: [(yield [11] * 5)]} {'{at}'}
 
