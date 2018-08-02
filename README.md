@@ -433,20 +433,48 @@ in the resulting output in their stringized form:
 ```
 
 
+## Namespaces and processor objects
+
+Every processor instance has its own space for global names. This
+namespace is independent of the tproc's code namespace so users
+are free to name their generators and other global entities as
+they like.
+
+The only name that comes predefined in the input's code namespace
+is `tproc`. That name refers to the processor object that handles
+the input source. Through this name the input code can access the
+public API of the processor class described in the corresponding
+section below. For example, `tproc.LiteralToken` refers to the
+type of tokens passed to generators that have arguments:
+
+```python
+@main
+{'%r' % tproc.LiteralToken}
+```
+
+```
+<class 'tproc.LiteralToken'>
+```
+
+
 ## API
 
-### tproc.Processor
+### `tproc.LiteralToken`
+
+* `LiteralToken.content`
+
+  Contains the literal of the token as a string.
+
+### `tproc.Processor`
 
 * `Processor.expand(input)`
 
    Returns a generator producing a fully expanded input. The
    `input` parameter is a generator of source data.
 
-### tproc.LiteralToken
+* `Processor.LiteralToken`
 
-* `LiteralToken.content`
-
-  Contains the literal of the token as a string.
+   The type of literal tokens. See `tproc.LiteralToken`.
 
 
 ## Basic design principles
