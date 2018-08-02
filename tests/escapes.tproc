@@ -1,0 +1,31 @@
+
+@
+def code(source):
+    yield '```'
+    for chunk in source:
+        yield chunk
+    yield '```'
+
+@main
+{code::
+#include <iostream>
+
+int main() \{
+    std\:\:cout << "Hello World!" << std\:\:endl;
+\}
+}
+
+@expected
+```
+#include <iostream>
+
+int main() {lbrace}
+    std::cout << "Hello World!" << std::endl;
+{rbrace}
+```
+
+@lbrace
+\{
+
+@rbrace
+\}

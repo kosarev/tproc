@@ -11,7 +11,7 @@ import types
 # arbitrary types, not just strings.
 class _Stream(object):
     def __init__(self, input):
-        assert isinstance(input, types.GeneratorType)
+        assert isinstance(input, types.GeneratorType), input
         self._front = []
         self._input = input
 
@@ -283,7 +283,7 @@ class Processor:
         args = []
         while tokens:
             arg = self._parse_field_component(tokens)
-            args.append(self.expand((x for x in arg)))
+            args.append(self._expand_tokens((x for x in arg)))
 
         # Evaluate.
         value = self._stringify_tokens(value)
@@ -295,7 +295,7 @@ class Processor:
             value = (x for x in [value])
 
         # Expand.
-        value = self.expand(value)
+        value = self._expand_tokens(value)
 
         # Format.
         if not format_spec:
@@ -306,21 +306,33 @@ class Processor:
         else:
             # Collect fully expanded field and format it as requested.
             format_spec = self._stringify_tokens(format_spec)
-            value = ''.join([x for x in value])
+            # value = ''.join([x for x in value])
+            value = self._stringify_tokens(value)
             value = '{0:{1}}'.format(value, format_spec)
             yield value
 
-    # Expands a given format input.
-    def expand(self, input):
+    # Expands a sequence of tokens, and keeps the output as a
+    # sequence of tokens.
+    def _expand_tokens(self, input):
         input = _Stream(input)
         for token in self._format_parser(input):
             if isinstance(token, _LiteralToken):
-                yield token.content
+                yield token
                 continue
 
             assert isinstance(token, _ReplacementField)
             for chunk in self._parse_and_expand_field(token.content):
                 yield chunk
+
+    # Expands a given format input.
+    def expand(self, input):
+        for chunk in self._expand_tokens(input):
+            if isinstance(chunk, _TokenBase):
+                # All other tokens shall be consumed at this point.
+                assert isinstance(chunk, _LiteralToken), chunk
+                chunk = chunk.content
+
+            yield chunk
 
     # Expands a replacement field specified as a string.
     def expand_field(self, field):
