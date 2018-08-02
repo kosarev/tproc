@@ -376,6 +376,12 @@ the literal as a string.
    Returns a generator producing a fully expanded input. The
    `input` parameter is a generator of source data.
 
+### tproc.LiteralToken
+
+* `LiteralToken.content`
+
+  Contains the literal of the token as a string.
+
 
 ## Basic design principles
 

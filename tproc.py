@@ -103,6 +103,9 @@ class Processor:
         # their processor objects.
         self._namespace = { 'tproc': self }
 
+        # Make literal tokens be visible through processor objects.
+        self.LiteralToken = LiteralToken
+
     # Checks if a given string chunk beings a definition.
     def _is_header(self, chunk):
         return chunk.startswith(self._definition_prefix)
