@@ -5,3 +5,6 @@
 @
 def echo(content):
     return content
+
+@expected
+'  :  '
