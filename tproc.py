@@ -81,7 +81,8 @@ class Processor:
 
         # These are the standard C escape sequences, which are very common
         # among various kinds of textual sources. We support them for better
-        # interchability, and to provide a way to represent special characters.
+        # interchangeability, and to provide a way to represent special
+        # characters.
         # TODO: Support numerical escape sequences, including Unicode ones.
         self._escapes = {
             '\\': '\\',     '\'': '\'',     '\"': '\"',     'a': '\a',
@@ -92,6 +93,10 @@ class Processor:
         # We also want additional escape sequences for all the delimiter
         # tokens.
         self._escapes.update(dict((x, x) for x in self._delimiters))
+
+        # And another escape sequence for the definition prefix.
+        self._escapes.update({self._definition_prefix:
+                                  self._definition_prefix})
 
         # The namespace where the sources to process define their entities.
         # Here we inject a predefined name through which sources can access

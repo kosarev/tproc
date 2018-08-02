@@ -217,8 +217,8 @@ This gives:
 <section><title>SYNOPSIS</title><body>tproc [-e DEFINITION] [infile] [outfile]</body></section>
 ```
 
-And of course such arguments can nest and each of them gets
-expanded before passing to the generator:
+And of course such arguments can nest and each of the nested
+arguments gets expanded before passing to the generator:
 
 ```python
 @
@@ -237,6 +237,49 @@ def i(body):
 @main
 {p::It is {i::crucial} to support nested arguments.}
 ```
+
+
+## Escape sequences
+
+To support nested arguments it is necessary that curly braces and
+colons preserve their special meaning everywhere within bodies of
+text definitions. But that also means there should be a way to
+specify the brace and colon characters in its literal meaning,
+that is, as part of the body text. Escape sequences is the way to
+do that.
+
+Escape sequences start with slash (`\`) followed by the character
+to escape. For example:
+
+```python
+@
+@main
+This example:
+
+{code::
+#include <iostream>
+
+int main() \{
+    std\:\:cout << "@ Hey! @" << std\:\:endl;
+\}
+}
+
+just prints:
+
+\@ Hey! \@
+
+@
+def code(source):
+    yield '```'
+    for chunk in source: yield chunk
+    yield '```'
+```
+
+To represent non-printable characters and for better
+interchangeability with other sources and consumers of textual
+data, tproc also supports the standard C escape sequences:
+
+`\\` `\'` `\"` `\a` `\b` `\f` `\n` `\r` `\t` `\v`
 
 
 ## API

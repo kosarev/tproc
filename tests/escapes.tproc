@@ -7,25 +7,40 @@ def code(source):
     yield '```'
 
 @main
+This example:
+
 {code::
 #include <iostream>
 
 int main() \{
-    std\:\:cout << "Hello World!" << std\:\:endl;
+    std\:\:cout << "@ Hey! @" << std\:\:endl;
 \}
 }
 
+just prints:
+
+\@ Hey! \@
+
 @expected
+This example:
+
 ```
 #include <iostream>
 
 int main() {lbrace}
-    std::cout << "Hello World!" << std::endl;
+    std::cout << "@ Hey! @" << std::endl;
 {rbrace}
 ```
+
+just prints:
+
+{at} Hey! {at}
 
 @lbrace
 \{
 
 @rbrace
 \}
+
+@at
+\@
