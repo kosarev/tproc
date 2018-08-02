@@ -103,6 +103,9 @@ class Processor:
         # their processor objects.
         self._namespace = { 'tproc': self }
 
+        # Options.
+        self.opts = dict()
+
         # Make literal tokens be visible through processor objects.
         self.LiteralToken = LiteralToken
 
@@ -355,12 +358,23 @@ def main():
     args_parser.add_argument('output_file', nargs='?',
                              type=argparse.FileType('w'), default=sys.stdout)
     args_parser.add_argument('-e', '--expand', type=str, default='main',
-                             metavar='DEFINITION',
+                             metavar='definition',
                              help='specify the definition to expand')
+    args_parser.add_argument('-d', '--define', metavar='name[=value]',
+                             action='append', nargs=1,
+                             help='define option')
     args = args_parser.parse_args()
 
-    # Process input.
+    # Parse options.
     p = Processor()
+    for opt in args.define:
+        assert len(opt) == 1
+        opt = opt[0].split('=', 1)  # maxsplit=1
+        name = opt[0]
+        value = opt[1] if len(opt) > 1 else ''
+        p.opts[name] = value
+
+    # Process input.
     input = args.input_file
     if input == sys.stdin:
         input_dir = ''
