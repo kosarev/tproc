@@ -5,7 +5,7 @@ import setuptools
 
 setuptools.setup(
     name='tproc',
-    version='1.0a0',
+    version='1.0a1',
     packages=[],
     scripts=['tproc.py'],
     install_requires=[
@@ -24,7 +24,7 @@ setuptools.setup(
     },
     test_suite='tests',
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 3 - Alpha',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Intended Audience :: Information Technology',
