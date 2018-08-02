@@ -109,6 +109,9 @@ class Processor:
         # Make literal tokens be visible through processor objects.
         self.LiteralToken = LiteralToken
 
+        # The stack of directories of currently included files.
+        self.include_dirs = ['.']
+
     # Checks if a given string chunk beings a definition.
     def _is_header(self, chunk):
         return chunk.startswith(self._definition_prefix)
@@ -167,6 +170,8 @@ class Processor:
     def process_input(self, input, input_name='<input>', input_dir=''):
         input = _Stream(input)
 
+        self.include_dirs.append(input_dir)
+
         for chunk in input:
             input.push_back(chunk)
             if self._is_header(chunk):
@@ -175,11 +180,24 @@ class Processor:
             else:
                 self._skip_line(input)
 
-    # Processes a given input file.
+        self.include_dirs.pop()
+
+    # Processes a given input file. If the passed path is
+    # relative, it is considered relative to the current
+    # directory.
     def process_file(self, path):
         with open(path, 'r') as f:
             dir = os.path.dirname(path)
             self.process_input((x for x in f), path, dir)
+
+    # Includes a source file. If the passed path is relative,
+    # it is considered relative to the directory of the currently
+    # processed file.
+    def include(self, path):
+        if not os.path.isabs(path):
+            path = os.path.join(self.include_dirs[-1], path)
+
+        self.process_file(path)
 
     # Parses tokens and translates escape sequences.
     def _tokens_parser(self, input):
@@ -197,7 +215,7 @@ class Processor:
 
             if escaped:
                 c = chunk[0]
-                assert c in self._escapes, c  # TODO: error: Unknown escape sequence.
+                assert c in self._escapes, repr(c)  # TODO: error: Unknown escape sequence.
                 yield LiteralToken(self._escapes[c])
                 escaped = False
 
