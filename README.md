@@ -20,7 +20,10 @@ external code having access to the processor object.
 
 * Available under the MIT license.
 
-{:toc}
+
+## Contents
+
+[Installation](#installation)
 
 ## Installation
 
