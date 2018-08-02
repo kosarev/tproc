@@ -442,7 +442,7 @@ Python data structures. For example:
 {p::
 First paragraph.}
 {p::
-Second paragaph.}
+Second paragraph.}
 }
 
 @
@@ -459,7 +459,7 @@ def section(title, body):
 Results in:
 
 ```
-('section', ['TITLE'], ['\n', ('p', ['\nFirst paragraph.']), '\n', ('p', ['\nSecond paragaph.']), '\n'])
+('section', ['TITLE'], ['\n', ('p', ['\nFirst paragraph.']), '\n', ('p', ['\nSecond paragraph.']), '\n'])
 ```
 
 

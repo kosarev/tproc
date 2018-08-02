@@ -4,7 +4,7 @@
 {p::
 First paragraph.}
 {p::
-Second paragaph.}
+Second paragraph.}
 }
 
 @
@@ -22,4 +22,4 @@ def expected():
     yield ('section',
                ['TITLE'],
                ['\n', ('p', ['\nFirst paragraph.']), '\n',
-                ('p', ['\nSecond paragaph.']), '\n'])
+                ('p', ['\nSecond paragraph.']), '\n'])
