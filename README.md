@@ -380,17 +380,16 @@ the `.content` field storing the original value.
 
 Here's how it works:
 
-<!-- In 'python' mode this block highlights 'wrong' escape
-     sequences. -->
-```
+```python
 @content
-{55} {[5, 7, 9]} {tuple(range(3))} {lambda\: [(yield [11] * 5)]} {'{at}'}
+{55} {[5, 7, 9]} {tuple(range(3))} {'{year}'}
+# {lambda\: [(yield [11] * 5)]}
+
+@year
+2018
 
 @main
 {dump::{content}}
-
-@at
-\@
 
 @
 def dump(content):
@@ -411,26 +410,26 @@ tokens:
 <literal ' '>
 <literal (0, 1, 2)>
 <literal ' '>
+<literal '2018'>
+<literal '\n# '>
 <literal [11, 11, 11, 11, 11]>
-<literal ' '>
-<literal '@'>
 ```
 
 On full expansion, tokens are converted back to their literals and appear
 in the resulting output in their stringized form:
 
-<!-- In 'python' mode this block highlights 'wrong' escape
-     sequences. -->
-```python console
+```python
 @main
-{55} {[5, 7, 9]} {tuple(range(3))} {lambda\: [(yield [11] * 5)]} {'{at}'}
+{55} {[5, 7, 9]} {tuple(range(3))} {'{year}'}
+# {lambda\: [(yield [11] * 5)]}
 
-@at
-\@
+@year
+2018
 ```
 
 ```
-55 [5, 7, 9] (0, 1, 2) [11, 11, 11, 11, 11] @
+55 [5, 7, 9] (0, 1, 2) 2018
+# [11, 11, 11, 11, 11]
 ```
 
 
