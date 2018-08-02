@@ -390,12 +390,13 @@ def main():
 
     # Parse options.
     p = Processor()
-    for opt in args.define:
-        assert len(opt) == 1
-        opt = opt[0].split('=', 1)  # maxsplit=1
-        name = opt[0]
-        value = opt[1] if len(opt) > 1 else ''
-        p.opts[name] = value
+    if args.define:
+        for opt in args.define:
+            assert len(opt) == 1
+            opt = opt[0].split('=', 1)  # maxsplit=1
+            name = opt[0]
+            value = opt[1] if len(opt) > 1 else ''
+            p.opts[name] = value
 
     # Process input.
     input = args.input_file
