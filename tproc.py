@@ -215,10 +215,15 @@ class Processor:
 
             if escaped:
                 c = chunk[0]
-                assert c in self._escapes, repr(c)  # TODO: error: Unknown escape sequence.
-                yield LiteralToken(self._escapes[c])
-                escaped = False
+                if c == '\n':
+                    # For line splices, just ignore the escape sequence
+                    # completely.
+                    pass
+                else:
+                    assert c in self._escapes, repr(c)  # TODO: error: Unknown escape sequence.
+                    yield LiteralToken(self._escapes[c])
 
+                escaped = False
                 input.push_back(chunk[1:])
                 continue
 
