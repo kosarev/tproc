@@ -371,7 +371,7 @@ the literal as a string.
 
 # Generation of non-text data
 
-We we already said, the value of a replacement field can be any
+As we already said, the value of a replacement field can be any
 expression. If it evaluates to something callable, it is called
 and the returned value is considered as the field value. Then, if
 the value is a generator, it becomes the source of the value
@@ -380,7 +380,9 @@ the `.content` field storing the original value.
 
 Here's how it works:
 
-```python
+<!-- In 'python' mode this block highlights 'wrong' escape
+     sequences. -->
+```
 @content
 {55} {[5, 7, 9]} {tuple(range(3))} {lambda\: [(yield [11] * 5)]} {'{at}'}
 
@@ -417,7 +419,9 @@ tokens:
 On full expansion, tokens are converted back to their literals and appear
 in the resulting output in their stringized form:
 
-```python
+<!-- In 'python' mode this block highlights 'wrong' escape
+     sequences. -->
+```pycon
 @main
 {55} {[5, 7, 9]} {tuple(range(3))} {lambda\: [(yield [11] * 5)]} {'{at}'}
 
