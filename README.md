@@ -24,16 +24,27 @@ external code having access to the processor object.
 ## Contents
 
 [Installation](#installation)
+
 [Hello world](#hello-world)
+
 [Definitions](#definitions)
+
 [Replacement fields](#replacement-fields)
+
 [Format specifiers](#format-specifiers)
+
 [Passing data to generators](#passing-data-to-generators)
+
 [Escape sequences](#escape-sequences)
+
 [Tokens](#tokens)
+
 [Generation of non-text data](#generation-of-non-text-data)
+
 [Namespaces and processor objects](#namespaces-and-processor-objects)
-[API][#api]
+
+[API](#api)
+
 [Basic design principles](#basic-design-principles)
 
 
