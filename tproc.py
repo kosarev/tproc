@@ -72,6 +72,9 @@ class Processor:
         # The character definitions begin with.
         self._definition_prefix = '@'
 
+        # With this character begin comments within replacement fields.
+        self.comment_prefix = '#'
+
         # Delimiter tokens we recognize in inputs.
         self._delimiters = dict((x, _DelimiterToken(x))
                                     for x in ['{', '}', ':'])
@@ -312,7 +315,15 @@ class Processor:
     def _parse_and_expand_field(self, tokens):
         # Parse field components.
         value = self._parse_field_component(tokens)
+
+        # Skip empty fields.
         if not value:
+            return
+
+        # Skip comments.
+        if (isinstance(value[0], LiteralToken) and
+                isinstance(value[0].content, str) and
+                value[0].content.startswith(self.comment_prefix)):
             return
 
         format_spec = self._parse_field_component(tokens)

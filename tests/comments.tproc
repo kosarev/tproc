@@ -1,0 +1,7 @@
+
+@main
+1{#comment}2{#
+another commment}3{#}4
+
+@expected
+1234
