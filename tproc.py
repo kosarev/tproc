@@ -268,7 +268,9 @@ class Processor:
                 assert balance > 0  # TODO: error: No opening brace for this closing brace.
                 balance -= 1
                 if balance == 0:
-                    yield _ReplacementField(field)
+                    # Ignore empty fields.
+                    if field:
+                        yield _ReplacementField(field)
                     field = []
                     continue
 
@@ -315,10 +317,6 @@ class Processor:
     def _parse_and_expand_field(self, tokens):
         # Parse field components.
         value = self._parse_field_component(tokens)
-
-        # Skip empty fields.
-        if not value:
-            return
 
         # Skip comments.
         if (isinstance(value[0], LiteralToken) and
