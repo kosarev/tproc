@@ -312,6 +312,9 @@ class Processor:
     def _parse_and_expand_field(self, tokens):
         # Parse field components.
         value = self._parse_field_component(tokens)
+        if not value:
+            return
+
         format_spec = self._parse_field_component(tokens)
 
         args = []
