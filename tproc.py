@@ -73,11 +73,15 @@ class Processor:
         self._definition_prefix = '@'
 
         # With this character begin comments within replacement fields.
-        self.comment_prefix = '#'
+        self._comment_prefix = '#'
 
         # Delimiter tokens we recognize in inputs.
         self._delimiters = dict((x, _DelimiterToken(x))
                                     for x in ['{', '}', ':'])
+
+        self._left_brace = self._delimiters['{']
+        self._right_brace = self._delimiters['}']
+        self._colon = self._delimiters[':']
 
         # Escape sequences start with this character.
         self._escape_char = '\\'
@@ -205,6 +209,7 @@ class Processor:
     # Parses tokens and translates escape sequences.
     def _tokens_parser(self, input):
         escaped = False
+        commented_out = False
         for chunk in input:
             # Handle non-string chunks.
             if not isinstance(chunk, str):
@@ -216,6 +221,7 @@ class Processor:
                 yield chunk
                 continue
 
+            # Handle escaped characters.
             if escaped:
                 c = chunk[0]
                 if c == '\n':
@@ -241,10 +247,28 @@ class Processor:
             if repeat:
                 continue
 
-            if chunk == self._escape_char:
+            if not commented_out and chunk == self._escape_char:
                 escaped = True
                 continue
 
+            # Handle comments.
+            if commented_out:
+                if chunk == self._right_brace.content:
+                    commented_out = False
+                continue
+
+            if chunk == self._left_brace.content:
+                next_chunk = None
+                for next_chunk in input:
+                    input.push_back(next_chunk)
+                    break
+
+                if (isinstance(next_chunk, str) and
+                        next_chunk.startswith(self._comment_prefix)):
+                    commented_out = True
+                    continue
+
+            # Otherwise, return the chunk as a token.
             token = self._delimiters.get(chunk, None)
             if not token:
                 token = LiteralToken(chunk)
@@ -253,18 +277,15 @@ class Processor:
 
     # Parses invocations of replacement fields in a given input.
     def _format_parser(self, input):
-        left_brace = self._delimiters['{']
-        right_brace = self._delimiters['}']
-
         balance = 0
         field = []
         for token in self._tokens_parser(input):
-            if token is left_brace:
+            if token is self._left_brace:
                 balance += 1
                 if balance == 1:
                     continue
 
-            if token is right_brace:
+            if token is self._right_brace:
                 assert balance > 0  # TODO: error: No opening brace for this closing brace.
                 balance -= 1
                 if balance == 0:
@@ -288,20 +309,16 @@ class Processor:
     # Parses part of a replacement field potentially delimited with colon
     # tokens.
     def _parse_field_component(self, tokens):
-        colon = self._delimiters[':']
-        left_brace = self._delimiters['{']
-        right_brace = self._delimiters['}']
-
         component = []
         balance = 0
         while tokens:
             token = tokens.pop(0)
-            if balance == 0 and token is colon:
+            if balance == 0 and token is self._colon:
                 break
 
-            if token is left_brace:
+            if token is self._left_brace:
                 balance += 1
-            elif token is right_brace and balance > 0:
+            elif token is self._right_brace and balance > 0:
                 balance -= 1
 
             component.append(token)
@@ -317,13 +334,6 @@ class Processor:
     def _parse_and_expand_field(self, tokens):
         # Parse field components.
         value = self._parse_field_component(tokens)
-
-        # Skip comments.
-        if (isinstance(value[0], LiteralToken) and
-                isinstance(value[0].content, str) and
-                value[0].content.startswith(self.comment_prefix)):
-            return
-
         format_spec = self._parse_field_component(tokens)
 
         args = []

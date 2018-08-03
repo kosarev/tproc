@@ -1,7 +1,7 @@
 
 @main
 1{#comment}2{#
-another commment}3{#}4
+another commment}3{#}4{# \~ \% \Z \[ }5
 
 @expected
-1234
+12345
