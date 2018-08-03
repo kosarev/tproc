@@ -1,0 +1,8 @@
+
+@
+# Returns, not yields.
+def main():
+    return 'hello'
+
+@expected
+hello

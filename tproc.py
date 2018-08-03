@@ -347,7 +347,8 @@ class Processor:
 
         if callable(value):
             value = value(*args)
-        elif not isinstance(value, types.GeneratorType):
+
+        if not isinstance(value, types.GeneratorType):
             value = (x for x in [value])
 
         # Expand.
