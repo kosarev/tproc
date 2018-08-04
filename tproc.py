@@ -162,7 +162,7 @@ class Processor:
 
     # Processes a text definition.
     def define_text(self, name, text):
-        self._namespace[name] = lambda: [(yield text.rstrip())]
+        self._namespace[name] = lambda: [(yield text.strip())]
 
     # Processes a single definition.
     def process_definition(self, header, input):
