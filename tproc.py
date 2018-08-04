@@ -38,7 +38,7 @@ class _Stream(object):
 
 
 # Base class for all tokens.
-class _TokenBase(object):
+class TokenBase(object):
     def __init__(self, kind, content):
         self._kind = kind
         self.content = content
@@ -48,20 +48,20 @@ class _TokenBase(object):
 
 
 # Class for delimiters, such as curly braces.
-class _DelimiterToken(_TokenBase):
+class _DelimiterToken(TokenBase):
     def __init__(self, literal):
         super(_DelimiterToken, self).__init__('delimiter', literal)
 
 
 # Represents tokens that should be treated as literal data. The content may or
 # may not be a string.
-class LiteralToken(_TokenBase):
+class LiteralToken(TokenBase):
     def __init__(self, content):
         super(LiteralToken, self).__init__('literal', content)
 
 
 # Designates invocations of fields to expand and replace.
-class _ReplacementField(_TokenBase):
+class _ReplacementField(TokenBase):
     def __init__(self, content):
         super(_ReplacementField, self).__init__('field', content)
 
@@ -113,7 +113,8 @@ class Processor:
         # Options.
         self.opts = dict()
 
-        # Make literal tokens be visible through processor objects.
+        # Make some token types be visible through processor objects.
+        self.TokenBase = TokenBase
         self.LiteralToken = LiteralToken
 
         # The stack of directories of currently included files.
@@ -215,7 +216,7 @@ class Processor:
             if not isinstance(chunk, str):
                 assert not escaped  # TODO
 
-                if not isinstance(chunk, _TokenBase):
+                if not isinstance(chunk, TokenBase):
                     chunk = LiteralToken(chunk)
 
                 yield chunk
@@ -384,7 +385,7 @@ class Processor:
     # Expands a given format input.
     def expand(self, input):
         for chunk in self._expand_tokens(input):
-            if isinstance(chunk, _TokenBase):
+            if isinstance(chunk, TokenBase):
                 # All other tokens shall be consumed at this point.
                 assert isinstance(chunk, LiteralToken), chunk
                 chunk = chunk.content
