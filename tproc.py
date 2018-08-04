@@ -374,20 +374,20 @@ class Processor:
     def _expand_tokens(self, input):
         input = _Stream(input)
         for token in self._format_parser(input):
-            if isinstance(token, LiteralToken):
-                yield token
+            if isinstance(token, _ReplacementField):
+                for chunk in self._parse_and_expand_field(token.content):
+                    yield chunk
                 continue
 
-            assert isinstance(token, _ReplacementField)
-            for chunk in self._parse_and_expand_field(token.content):
-                yield chunk
+            yield token
 
     # Expands a given format input.
     def expand(self, input):
         for chunk in self._expand_tokens(input):
-            if isinstance(chunk, TokenBase):
-                # All other tokens shall be consumed at this point.
-                assert isinstance(chunk, LiteralToken), chunk
+            # All delimiters shall be consumed or converted at this point.
+            assert not isinstance(chunk, _DelimiterToken)
+
+            if isinstance(chunk, LiteralToken):
                 chunk = chunk.content
 
             yield chunk
