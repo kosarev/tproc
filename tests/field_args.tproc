@@ -1,0 +1,30 @@
+
+Test that we handle empty trailing arguments correctly.
+
+@
+def x(*args):
+    yield tproc.LiteralToken('[')
+
+    for i, arg in enumerate(args):
+        if i > 0:
+          yield tproc.LiteralToken(', ')
+
+        yield tproc.LiteralToken('%d=' % i)
+        for chunk in arg:
+            yield chunk
+
+    yield tproc.LiteralToken(']')
+
+
+@main
+no args: {x}  {x:}
+  1 arg: {x::0}  {x::}
+ 2 args: {x::0:1}  {x::0:}  {x:::}
+ 3 args: {x::0:1:2}  {x::0:1:}  {x::::}
+
+
+@expected
+no args: []  []
+  1 arg: [0=0]  [0=]
+ 2 args: [0=0, 1=1]  [0=0, 1=]  [0=, 1=]
+ 3 args: [0=0, 1=1, 2=2]  [0=0, 1=1, 2=]  [0=, 1=, 2=]

@@ -312,9 +312,11 @@ class Processor:
     def _parse_field_component(self, tokens):
         component = []
         balance = 0
+        last_arg = True
         while tokens:
             token = tokens.pop(0)
             if balance == 0 and token is self._colon:
+                last_arg = False
                 break
 
             if token is self._left_brace:
@@ -324,7 +326,7 @@ class Processor:
 
             component.append(token)
 
-        return component
+        return last_arg, component
 
     # Turns a given sequence of tokens into a string.
     def _stringify_tokens(self, tokens):
@@ -334,12 +336,12 @@ class Processor:
     # it.
     def _parse_and_expand_field(self, tokens):
         # Parse field components.
-        value = self._parse_field_component(tokens)
-        format_spec = self._parse_field_component(tokens)
+        last_arg, value = self._parse_field_component(tokens)
+        last_arg, format_spec = self._parse_field_component(tokens)
 
         args = []
-        while tokens:
-            arg = self._parse_field_component(tokens)
+        while not last_arg:
+            last_arg, arg = self._parse_field_component(tokens)
             args.append(self._expand_tokens((x for x in arg)))
 
         # Evaluate.
