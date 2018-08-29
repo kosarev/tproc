@@ -169,6 +169,7 @@ class Processor:
         body = self._collect_body(input)
 
         if header == '@':
+            body = body.replace('\\@', '@')
             self.define_code(body)
         else:
             name = header[1:]

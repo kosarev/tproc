@@ -1,0 +1,21 @@
+
+@
+def decorator(f):
+    def wrapper():
+        yield '[before]'
+
+        for chunk in f():
+            yield chunk
+
+        yield '[after]'
+
+    return wrapper
+
+
+\@decorator
+def main():
+    yield '[within]'
+
+
+@expected
+[before][within][after]
