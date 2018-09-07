@@ -7,6 +7,23 @@ import sys
 import types
 
 
+# Auxiliary Processor-related error info.
+class ErrorInfo:
+    def __init__(self):
+        self.files = []
+
+    def report(self):
+        for f in self.files:
+            print("tproc: While processing file '%s'." % f,
+                  file=sys.stderr)
+
+
+# Initializes error info for a given exception.
+def _init_error_info(e):
+    if not hasattr(e, 'tproc'):
+        e.tproc = ErrorInfo()
+
+
 # Implements a stream with push-back functionality. Can deal with
 # arbitrary types, not just strings.
 class _Stream(object):
@@ -197,7 +214,12 @@ class Processor:
     def process_file(self, path):
         with open(path, 'r') as f:
             dir = os.path.dirname(path)
-            self.process_input((x for x in f), path, dir)
+            try:
+                self.process_input((x for x in f), path, dir)
+            except Exception as e:
+                _init_error_info(e)
+                e.tproc.files.append(path)
+                raise
 
     # Includes a source file. If the passed path is relative,
     # it is considered relative to the directory of the currently
@@ -425,18 +447,22 @@ def main():
             value = opt[1] if len(opt) > 1 else ''
             p.opts[name] = value
 
-    # Process input.
-    input = args.input_file
-    if input == sys.stdin:
-        input_dir = ''
-    else:
-        input_dir = os.path.dirname(input.name)
-    p.process_input((x for x in input), input.name, input_dir)
+    try:
+        # Process input.
+        input = args.input_file
+        if input == sys.stdin:
+            input_dir = ''
+        else:
+            input_dir = os.path.dirname(input.name)
+        p.process_input((x for x in input), input.name, input_dir)
 
-    # Expand the definition.
-    output = args.output_file
-    for chunk in p.expand_field(args.expand):
-        output.write(str(chunk))
+        # Expand the definition.
+        output = args.output_file
+        for chunk in p.expand_field(args.expand):
+            output.write(str(chunk))
+    except Exception as e:
+        e.tproc.report()
+        raise
 
 
 if __name__ == '__main__':
