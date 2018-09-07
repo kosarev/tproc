@@ -15,10 +15,10 @@ class ErrorInfo:
         self.fields = []
 
     def report(self):
-        for f in self.files:
+        for f in reversed(self.files):
             print("tproc: In file '%s':" % f, file=sys.stderr)
 
-        for f in self.fields:
+        for f in reversed(self.fields):
             print("tproc: In field '%s':" % f, file=sys.stderr)
 
 
@@ -372,8 +372,8 @@ class Processor:
             args.append(self._expand_tokens((x for x in arg)))
 
         # Evaluate.
-        value = self._stringify_tokens(value)
-        value = eval(value, self._namespace)
+        value_string = self._stringify_tokens(value)
+        value = eval(value_string, self._namespace)
 
         if callable(value):
             value = value(*args)
@@ -388,8 +388,13 @@ class Processor:
         if not format_spec:
             # No formatting. In this case we can give away chunks as soon as we
             # get them.
-            for chunk in value:
-                yield chunk
+            try:
+                for chunk in value:
+                    yield chunk
+            except Exception as e:
+                _init_error_info(e)
+                e.tproc.fields.append(value_string)
+                raise
         else:
             # Collect fully expanded field and format it as requested.
             format_spec = self._stringify_tokens(format_spec)
@@ -423,13 +428,8 @@ class Processor:
 
     # Expands a replacement field specified as a string.
     def expand_field(self, field):
-        try:
-            for chunk in self.expand((x for x in ['{%s}' % field])):
-                yield chunk
-        except Exception as e:
-            _init_error_info(e)
-            e.tproc.fields.append(field)
-            raise
+        for chunk in self.expand((x for x in ['{%s}' % field])):
+            yield chunk
 
 
 def main():
