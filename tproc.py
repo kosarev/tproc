@@ -1,20 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 import argparse
 import os
 import sys
 import types
 
-
 # Auxiliary Processor-related error info.
 class ErrorInfo:
     def __init__(self):
         self.files = []
+        self.fields = []
 
     def report(self):
         for f in self.files:
             print("tproc: While processing file '%s'." % f,
+                  file=sys.stderr)
+
+        for f in self.fields:
+            print("tproc: While processing field '%s'." % f,
                   file=sys.stderr)
 
 
@@ -419,7 +425,13 @@ class Processor:
 
     # Expands a replacement field specified as a string.
     def expand_field(self, field):
-        return self.expand((x for x in ['{%s}' % field]))
+        try:
+            for chunk in self.expand((x for x in ['{%s}' % field])):
+                yield chunk
+        except Exception as e:
+            _init_error_info(e)
+            e.tproc.fields.append(field)
+            raise
 
 
 def main():
