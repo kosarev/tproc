@@ -16,12 +16,10 @@ class ErrorInfo:
 
     def report(self):
         for f in self.files:
-            print("tproc: While processing file '%s':" % f,
-                  file=sys.stderr)
+            print("tproc: In file '%s':" % f, file=sys.stderr)
 
         for f in self.fields:
-            print("tproc: While processing field '%s':" % f,
-                  file=sys.stderr)
+            print("tproc: In field '%s':" % f, file=sys.stderr)
 
 
 # Initializes error info for a given exception.
