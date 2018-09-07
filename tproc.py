@@ -16,11 +16,11 @@ class ErrorInfo:
 
     def report(self):
         for f in self.files:
-            print("tproc: While processing file '%s'." % f,
+            print("tproc: While processing file '%s':" % f,
                   file=sys.stderr)
 
         for f in self.fields:
-            print("tproc: While processing field '%s'." % f,
+            print("tproc: While processing field '%s':" % f,
                   file=sys.stderr)
 
 
@@ -200,19 +200,24 @@ class Processor:
 
     # Processes a given input.
     def process_input(self, input, input_name='<input>', input_dir=''):
-        input = _Stream(input)
+        try:
+            input = _Stream(input)
 
-        self.include_dirs.append(input_dir)
+            self.include_dirs.append(input_dir)
 
-        for chunk in input:
-            input.push_back(chunk)
-            if self._is_header(chunk):
-                header = self._collect_line(input)
-                self.process_definition(header, input)
-            else:
-                self._skip_line(input)
+            for chunk in input:
+                input.push_back(chunk)
+                if self._is_header(chunk):
+                    header = self._collect_line(input)
+                    self.process_definition(header, input)
+                else:
+                    self._skip_line(input)
 
-        self.include_dirs.pop()
+            self.include_dirs.pop()
+        except Exception as e:
+            _init_error_info(e)
+            e.tproc.files.append(os.path.join(input_dir, input_name))
+            raise
 
     # Processes a given input file. If the passed path is
     # relative, it is considered relative to the current
@@ -220,12 +225,7 @@ class Processor:
     def process_file(self, path):
         with open(path, 'r') as f:
             dir = os.path.dirname(path)
-            try:
-                self.process_input((x for x in f), path, dir)
-            except Exception as e:
-                _init_error_info(e)
-                e.tproc.files.append(path)
-                raise
+            self.process_input((x for x in f), path, dir)
 
     # Includes a source file. If the passed path is relative,
     # it is considered relative to the directory of the currently
@@ -459,20 +459,27 @@ def main():
             value = opt[1] if len(opt) > 1 else ''
             p.opts[name] = value
 
+    # Process input.
     try:
-        # Process input.
         input = args.input_file
         if input == sys.stdin:
             input_dir = ''
         else:
             input_dir = os.path.dirname(input.name)
         p.process_input((x for x in input), input.name, input_dir)
+    except Exception as e:
+        _init_error_info(e)
+        e.tproc.report()
+        raise
 
-        # Expand the definition.
+    # Expand the definition.
+    try:
         output = args.output_file
         for chunk in p.expand_field(args.expand):
             output.write(str(chunk))
     except Exception as e:
+        _init_error_info(e)
+        e.tproc.files.append(input.name)
         e.tproc.report()
         raise
 
