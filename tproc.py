@@ -41,11 +41,12 @@ class _Stream(object):
             if self._front:
                 chunk = self._front.pop()
             else:
-                chunk = None
+                got_chunk = False
                 for chunk in self._input:
+                    got_chunk = True
                     break
 
-                if not chunk:
+                if not got_chunk:
                     return
 
             if chunk:
