@@ -5,7 +5,7 @@ import setuptools
 
 setuptools.setup(
     name='tproc',
-    version='1.0a1',
+    version='1.0a2',
     packages=[],
     scripts=['tproc.py'],
     install_requires=[
