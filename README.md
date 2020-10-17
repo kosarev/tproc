@@ -4,7 +4,9 @@ A small yet powerful text processor written in Python.
 
 [![Build Status](https://travis-ci.org/kosarev/tproc.svg?branch=master)](https://travis-ci.org/kosarev/tproc)
 
-Features:
+## Features:
+
+* Provides a way to program your documentation.
 
 * Unleashes the full power of Python for organizing, generating,
 validating and debugging your data. Supports arbitrary Python
