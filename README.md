@@ -2,7 +2,10 @@
 
 A small yet powerful text processor written in Python.
 
-[![Build Status](https://travis-ci.org/kosarev/tproc.svg?branch=master)](https://travis-ci.org/kosarev/tproc)
+[![Python package CI](https://github.com/kosarev/tproc/actions/workflows/python-package.yml/badge.svg)](https://github.com/kosarev/tproc/actions/workflows/python-package.yml)
+[![PyPI](https://img.shields.io/pypi/v/tproc)](https://pypi.org/project/tproc/)
+[![Python](https://img.shields.io/pypi/pyversions/tproc)](https://pypi.org/project/tproc/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/kosarev/tproc/blob/master/LICENSE)
 
 ## Features:
 
@@ -18,7 +21,7 @@ code and modules. No new languages to learn.
 called from anywhere in the input file as well as from an
 external code having access to the processor object.
 
-* Supports Python 2.7 and 3.
+* Requires Python 3.10 or later.
 
 * Available under the MIT license.
 
@@ -27,14 +30,19 @@ external code having access to the processor object.
 
 * [Installation](#installation)
 * [Hello world](#hello-world)
+* [Command line](#command-line)
 * [Definitions](#definitions)
 * [Replacement fields](#replacement-fields)
 * [Format specifiers](#format-specifiers)
 * [Passing data to generators](#passing-data-to-generators)
 * [Escape sequences](#escape-sequences)
+* [Line splices](#line-splices)
+* [Comments](#comments)
 * [Tokens](#tokens)
 * [Generation of non-text data](#generation-of-non-text-data)
 * [Namespaces and processor objects](#namespaces-and-processor-objects)
+* [Including files](#including-files)
+* [Errors](#errors)
 * [API](#api)
 * [Basic design principles](#basic-design-principles)
 
@@ -84,6 +92,46 @@ The part of the input before the first definition is ignored, and
 supposed to be used for describing the purpose of the input and
 other relevant information.
 
+Input files are read as UTF-8.
+
+
+## Command line
+
+```
+tproc [-e DEFINITION] [-d NAME[=VALUE]]... [input_file] [output_file]
+```
+
+* `input_file`, `output_file`
+
+  The file to process and the file to write the output to. If
+  omitted or `-`, the standard input and output are used.
+
+* `-e DEFINITION`, `--expand DEFINITION`
+
+  The definition to expand. `main` by default.
+
+* `-d NAME[=VALUE]`, `--define NAME[=VALUE]`
+
+  Sets an option that input code can read as
+  `tproc.opts['NAME']`. The value is an empty string if not
+  specified. May be repeated.
+
+  ```python
+  @main
+  Hello {tproc.opts['who']}!
+  ```
+
+  ```
+  $ tproc -d who=World hello.tproc
+  Hello World!
+  ```
+
+* `--version`
+
+  Prints the version of tproc.
+
+`python -m tproc` works the same way as `tproc`.
+
 
 ## Definitions
 
@@ -116,6 +164,27 @@ Hello World!
 
 Custom generators can yield the whole piece of data at once or
 generate it by chunks of arbitrary size.
+
+Lines in code blocks cannot start with `@`, as that would begin a
+new definition. To use decorators, escape the `@` character:
+
+```python
+@
+def bold(f):
+    def wrapper():
+        yield '<b>'
+        yield from f()
+        yield '</b>'
+    return wrapper
+
+\@bold
+def main():
+    yield 'Hello!'
+```
+
+```
+<b>Hello!</b>
+```
 
 
 ## Replacement fields
@@ -177,6 +246,8 @@ Output:
 
 To guarantee reproducible results invocations of replacement
 fields are always processed in the left-to-right order.
+
+Empty replacement fields, `{}`, expand to nothing.
 
 
 ## Format specifiers
@@ -301,6 +372,44 @@ data, tproc also supports the standard C escape sequences:
 
 `\\` `\'` `\"` `\a` `\b` `\f` `\n` `\r` `\t` `\v`
 
+Unknown escape sequences are errors.
+
+
+## Line splices
+
+An escape character just before the end of a line removes both
+itself and the line break, so long lines can be split:
+
+```python
+@main
+This is a single \
+line.
+```
+
+```
+This is a single line.
+```
+
+
+## Comments
+
+Replacement fields that start with `#` are comments and expand to
+nothing:
+
+```python
+@main
+1{# This is a comment.}2{#
+Comments may span several lines.}3
+```
+
+```
+123
+```
+
+Comments end at the first closing brace and cannot be nested.
+Their content is not parsed, so there are no escape sequences or
+replacement fields within comments.
+
 
 ## Tokens
 
@@ -387,14 +496,33 @@ In terms of code, literal tokens are instances of class
 the literal as a string.
 
 
-# Generation of non-text data
+## Generation of non-text data
 
 As we already said, the value of a replacement field can be any
 expression. If it evaluates to something callable, it is called
 and the returned value is considered as the field value. Then, if
 the value is a generator, it becomes the source of the value
 chunks. Any other values are converted into literal tokens with
-the `.content` field storing the original value.
+the `.content` field storing the original value. `None` values and
+empty strings produce no data, so the field
+`{tproc.include('x.tproc')}`, for example, expands to nothing.
+
+This means that functions do not have to be generators:
+
+```python
+@
+def main():
+    return 'Hello!'
+```
+
+```
+Hello!
+```
+
+Note that string chunks generators yield are subject to expansion,
+same as text definitions. To produce text that is not expanded,
+yield it as a literal token: `tproc.LiteralToken('{verbatim}')`.
+The output of fields with format specifiers is never expanded.
 
 Here's how it works:
 
@@ -505,24 +633,150 @@ type of tokens passed to generators that have arguments:
 ```
 
 
+## Including files
+
+`tproc.include(path)` processes the definitions of another file.
+Relative paths are resolved relative to the directory of the file
+being processed. Definitions from included files can then be used
+in the same way as local ones:
+
+```python
+# page.tproc
+
+@
+tproc.include('common/header.tproc')
+
+@main
+{header}
+Content.
+```
+
+```python
+# common/header.tproc
+
+@header
+<h1>Title</h1>
+```
+
+
+## Errors
+
+Malformed inputs, such as unbalanced braces or unknown escape
+sequences, raise `tproc.Error`. Its `.message`, `.source` and
+`.line` members describe what is wrong and where. On the command
+line, errors are reported with the stack of fields that were being
+expanded:
+
+```
+$ tproc page.tproc
+tproc: In file 'page.tproc':
+tproc: In field 'main':
+page.tproc:7: In field 'header':
+common/header.tproc:4: error: unterminated replacement field; missing '}'
+```
+
+Exceptions raised by input code propagate as usual. Code blocks
+and expressions in replacement fields are compiled with the names
+and lines of their source files, so tracebacks refer to the right
+places in inputs.
+
+
 ## API
 
-### `tproc.LiteralToken`
+### `tproc.__version__`
+
+The version of tproc as a string.
+
+### `tproc.main(args=None)`
+
+Runs tproc as a command-line tool. `args` is the list of
+command-line arguments; `sys.argv[1:]` by default.
+
+### `tproc.Error`
+
+The type of exceptions raised on malformed inputs.
+
+* `Error.message`
+
+  The description of the problem.
+
+* `Error.source`, `Error.line`
+
+  The name of the source and the line where the problem is, or
+  `None` if unknown.
+
+### `tproc.TokenBase`
+
+The base class of tokens.
+
+* `TokenBase.content`
+
+  The data the token carries.
+
+### `tproc.LiteralToken(content)`
+
+Tokens that represent literal data, as opposed to delimiters.
+Derived from `TokenBase`.
 
 * `LiteralToken.content`
 
-  Contains the literal of the token as a string.
+  Contains the literal of the token. A string for text data, and
+  the original value for non-text data.
 
 ### `tproc.Processor`
 
+* `Processor.process_file(path)`
+
+  Processes definitions in a given file. Relative paths are
+  relative to the current directory.
+
+* `Processor.process_input(input, input_name='<input>', input_dir='')`
+
+  Processes definitions in a given input, which is an iterable of
+  string chunks of any size, such as an open file. `input_name` is
+  used in diagnostics, and `input_dir` is the directory relative to
+  which included files are looked up.
+
+* `Processor.include(path)`
+
+  Processes definitions in a given file. Relative paths are
+  relative to the directory of the file being processed.
+
+* `Processor.define_code(code, source='<code>', line=1)`
+
+  Executes a given piece of Python code in the processor's
+  namespace. `source` and `line` refer to where the code comes
+  from, for diagnostics.
+
+* `Processor.define_text(name, text, source=None, line=1)`
+
+  Defines a text definition. Whitespace around the text is
+  stripped.
+
 * `Processor.expand(input)`
 
-   Returns a generator producing a fully expanded input. The
-   `input` parameter is a generator of source data.
+  Returns a generator producing a fully expanded input. The
+  `input` parameter is an iterable of source data.
 
-* `Processor.LiteralToken`
+* `Processor.expand_field(field)`
 
-   The type of literal tokens. See `tproc.LiteralToken`.
+  Returns a generator producing a fully expanded replacement
+  field specified as a string. For example,
+  `p.expand_field('main')` expands the `main` definition.
+
+* `Processor.opts`
+
+  The dictionary of options, as set by `-d` on the command line.
+
+* `Processor.TokenBase`, `Processor.LiteralToken`
+
+  The types of tokens. See `tproc.TokenBase` and
+  `tproc.LiteralToken`.
+
+How outputs are split into chunks is not specified and may change.
+
+See [examples/api.py](examples/api.py) for using tproc from Python
+code.
 
 
 ## Basic design principles
