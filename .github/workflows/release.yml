@@ -1,0 +1,122 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4.2.2
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install --upgrade pycodestyle ruff pytest mypy setuptools wheel
+
+    - name: Run pycodestyle, ruff and mypy
+      run: |
+        pycodestyle .
+        ruff check .
+        mypy --config-file .mypy.ini tproc tests examples
+
+    - name: Install the package
+      run: pip install .
+
+    - name: Run tests
+      run: pytest tests
+
+    - name: Run the examples
+      run: |
+        for e in examples/*.tproc; do tproc $e; done
+        for e in examples/*.py; do python $e; done
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4.2.2
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Build sdist and wheel
+      run: |
+        python -m pip install --upgrade build
+        python -m build
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: dist/
+
+  # Publishes to PyPI using OIDC Trusted Publishing (no stored tokens).
+  #
+  # One-time setup required in PyPI:
+  #   1. Log in at https://pypi.org and open the 'tproc' project's
+  #      "Publishing" page.
+  #   2. Add a new Trusted Publisher with these values:
+  #        PyPI project name:  tproc
+  #        Owner:              kosarev
+  #        Repository:         tproc
+  #        Workflow filename:  release.yml
+  #        Environment name:   pypi
+  #
+  # One-time setup required in GitHub:
+  #   Go to Settings -> Environments -> New environment, name it "pypi".
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      id-token: write
+
+    environment: pypi
+
+    steps:
+    - uses: actions/checkout@v4.2.2
+      with:
+        fetch-depth: 0        # need the annotated tag and its message
+
+    - name: Download sdist and wheel
+      uses: actions/download-artifact@v4
+      with:
+        name: dist
+        path: dist/
+
+    # The release notes are the CHANGELOG.md section for this version,
+    # read from the checked-out tag.
+    - name: Take the release notes from CHANGELOG.md
+      id: notes
+      run: |
+        version="${GITHUB_REF_NAME#v}"
+        {
+          echo 'body<<RELEASE_NOTES_EOF'
+          awk -v header="## $version" '
+            $0 == header { grabbing = 1; next }
+            /^## / && grabbing { exit }
+            grabbing { print }
+          ' CHANGELOG.md
+          echo RELEASE_NOTES_EOF
+        } >> "$GITHUB_OUTPUT"
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: dist/*
+        body: ${{ steps.notes.outputs.body }}
+
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1

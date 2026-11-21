@@ -1,0 +1,30 @@
+#!/usr/bin/env tproc
+
+Translating a custom markup directly into Python data structures.
+
+@main
+{dump::{section::TITLE:
+{p::
+First paragraph.}
+{p::
+Second paragraph.}
+}}
+
+@
+import pprint
+
+def collect(tokens):
+    return [x.content for x in tokens]
+
+def p(body):
+    yield ('p', collect(body))
+
+def section(title, body):
+    yield ('section', collect(title), collect(body))
+
+# Strings that generators yield are subject to expansion, so the
+# dump is wrapped into a literal token to keep its backslashes and
+# braces as they are.
+def dump(content):
+    for tree in collect(content):
+        yield tproc.LiteralToken(pprint.pformat(tree))

@@ -1,0 +1,16 @@
+#!/usr/bin/env tproc
+
+The part of the input before the first definition is ignored.
+
+Run as:
+
+  tproc examples/hello.tproc
+
+@hello
+Hello {world}
+
+@world
+World!
+
+@main
+{hello}

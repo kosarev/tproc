@@ -1,0 +1,23 @@
+#!/usr/bin/env tproc
+
+Generators that take arguments, and nested invocations.
+
+@
+def section(title, body):
+    yield '<section>'
+    yield '<title>'
+    yield from title
+    yield '</title>'
+    yield '<body>'
+    yield from body
+    yield '</body>'
+    yield '</section>'
+
+def i(body):
+    yield '<i>'
+    yield from body
+    yield '</i>'
+
+@main
+{section::NAME:tproc - A {i::small} text processor}
+{section::SYNOPSIS:tproc [-e DEFINITION] [-d NAME[=VALUE]] [infile] [outfile]}

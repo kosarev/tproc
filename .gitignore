@@ -3,3 +3,6 @@ dist/
 tproc.egg-info
 __pycache__
 *.pyc
+.mypy_cache
+.pytest_cache
+.ruff_cache
