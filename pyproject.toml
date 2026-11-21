@@ -50,3 +50,6 @@ packages = ['tproc']
 # py.typed is the PEP 561 marker telling type checkers the package
 # carries type information.
 tproc = ['py.typed']
+
+[tool.pytest.ini_options]
+testpaths = ['tests']
