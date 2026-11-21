@@ -4,7 +4,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'tproc'
-version = '1.0a2'
+dynamic = ['version']
 description = 'A small yet powerful text processor'
 readme = 'README.md'
 license = {text = 'MIT'}
@@ -45,6 +45,9 @@ tproc = 'tproc:main'
 
 [tool.setuptools]
 packages = ['tproc']
+
+[tool.setuptools.dynamic]
+version = {attr = 'tproc._version.__version__'}
 
 [tool.setuptools.package-data]
 # py.typed is the PEP 561 marker telling type checkers the package

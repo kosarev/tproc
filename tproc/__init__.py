@@ -11,12 +11,14 @@ from ._main import main
 from ._processor import Processor
 from ._tokens import LiteralToken
 from ._tokens import TokenBase
+from ._version import __version__
 
 __all__ = [
     'Error',
     'LiteralToken',
     'Processor',
     'TokenBase',
+    '__version__',
     'main',
 ]
 
