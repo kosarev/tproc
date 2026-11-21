@@ -1,7 +1,9 @@
 # Changelog
 
 
-## 2.0.0
+## 1.0.0
+
+The first stable release.
 
 Python 3 only, and a refresh of the infrastructure:
 

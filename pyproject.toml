@@ -15,7 +15,7 @@ authors = [
 requires-python = '>=3.10'
 keywords = ['text', 'macro', 'processing']
 classifiers = [
-  'Development Status :: 3 - Alpha',
+  'Development Status :: 5 - Production/Stable',
   'Environment :: Console',
   'Intended Audience :: Developers',
   'Intended Audience :: Information Technology',
