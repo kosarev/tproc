@@ -1,0 +1,34 @@
+# Ruff configuration. Enforced in CI alongside pycodestyle and mypy.
+
+target-version = "py310"
+line-length = 79
+
+extend-exclude = ["build"]
+
+[lint]
+# E/W pycodestyle, F pyflakes, I isort, B bugbear, UP pyupgrade,
+# C4 comprehensions, SIM simplifications, RUF Ruff-native,
+# PGH no-blanket-ignores, PTH pathlib-over-os.path,
+# TC typing-only imports, Q quote style (single, the house style).
+# Deliberately NOT selected: D (docstrings - the public API is documented
+# in README.md, internals use comments), S (asserts), PL (complexity/magic
+# values), TD/FIX (tagged-TODO ceremony), EM/TRY003/ANN/FBT (opinionated).
+select = [
+    "E", "W", "F", "I", "B", "UP",
+    "C4", "SIM", "RUF", "PGH", "PTH", "TC", "Q",
+]
+
+# A001/A002 would reject 'input', 'dir' and 'format' as variable names,
+# but A is not selected; S307 (eval) and S102 (exec) likewise, as
+# evaluating input code is what tproc does.
+
+[lint.flake8-quotes]
+inline-quotes = "single"
+multiline-quotes = "single"
+docstring-quotes = "double"
+
+# One name per import line (the house style): each import is its own line,
+# so a git diff shows exactly which name was added or removed, with no
+# reflowing of a combined/parenthesised block. I001 then only sorts.
+[lint.isort]
+force-single-line = true

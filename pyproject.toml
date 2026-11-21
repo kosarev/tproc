@@ -44,4 +44,9 @@ Homepage = 'https://github.com/kosarev/tproc/'
 tproc = 'tproc:main'
 
 [tool.setuptools]
-py-modules = ['tproc']
+packages = ['tproc']
+
+[tool.setuptools.package-data]
+# py.typed is the PEP 561 marker telling type checkers the package
+# carries type information.
+tproc = ['py.typed']
