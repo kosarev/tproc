@@ -1,0 +1,47 @@
+[build-system]
+requires = ['setuptools>=61.0', 'wheel']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'tproc'
+version = '1.0a2'
+description = 'A small yet powerful text processor'
+readme = 'README.md'
+license = {text = 'MIT'}
+authors = [
+  {name = 'Ivan Kosarev', email = 'mail@ivankosarev.com'}
+]
+requires-python = '>=3.10'
+keywords = ['text', 'macro', 'processing']
+classifiers = [
+  'Development Status :: 3 - Alpha',
+  'Environment :: Console',
+  'Intended Audience :: Developers',
+  'Intended Audience :: Information Technology',
+  'Intended Audience :: Science/Research',
+  'License :: OSI Approved :: MIT License',
+  'Operating System :: OS Independent',
+  'Programming Language :: Python :: 3',
+  'Programming Language :: Python :: 3.10',
+  'Programming Language :: Python :: 3.11',
+  'Programming Language :: Python :: 3.12',
+  'Programming Language :: Python :: 3.13',
+  'Programming Language :: Python :: 3.14',
+  'Programming Language :: Python :: Implementation :: CPython',
+  'Topic :: Documentation',
+  'Topic :: Software Development',
+  'Topic :: Software Development :: Pre-processors',
+  'Topic :: Text Processing',
+  'Topic :: Text Processing :: General',
+  'Topic :: Text Processing :: Markup',
+  'Topic :: Utilities',
+]
+
+[project.urls]
+Homepage = 'https://github.com/kosarev/tproc/'
+
+[project.scripts]
+tproc = 'tproc:main'
+
+[tool.setuptools]
+py-modules = ['tproc']

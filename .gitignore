@@ -1,7 +1,5 @@
-.eggs
-__pycache__
-dist
-tests/__pycache__
-tests/*.pyc
+build/
+dist/
 tproc.egg-info
+__pycache__
 *.pyc

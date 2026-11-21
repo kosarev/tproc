@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-
 import argparse
 import os
 import sys
@@ -30,7 +28,7 @@ def _init_error_info(e):
 
 # Implements a stream with push-back functionality. Can deal with
 # arbitrary types, not just strings.
-class _Stream(object):
+class _Stream:
     def __init__(self, input):
         assert isinstance(input, types.GeneratorType), input
         self._front = []
@@ -60,7 +58,7 @@ class _Stream(object):
 
 
 # Base class for all tokens.
-class TokenBase(object):
+class TokenBase:
     def __init__(self, kind, content):
         self._kind = kind
         self.content = content
@@ -72,20 +70,20 @@ class TokenBase(object):
 # Class for delimiters, such as curly braces.
 class _DelimiterToken(TokenBase):
     def __init__(self, literal):
-        super(_DelimiterToken, self).__init__('delimiter', literal)
+        super().__init__('delimiter', literal)
 
 
 # Represents tokens that should be treated as literal data. The content may or
 # may not be a string.
 class LiteralToken(TokenBase):
     def __init__(self, content):
-        super(LiteralToken, self).__init__('literal', content)
+        super().__init__('literal', content)
 
 
 # Designates invocations of fields to expand and replace.
 class _ReplacementField(TokenBase):
     def __init__(self, content):
-        super(_ReplacementField, self).__init__('field', content)
+        super().__init__('field', content)
 
 
 # The type of the processor instances.
@@ -98,8 +96,7 @@ class Processor:
         self._comment_prefix = '#'
 
         # Delimiter tokens we recognize in inputs.
-        self._delimiters = dict((x, _DelimiterToken(x))
-                                    for x in ['{', '}', ':'])
+        self._delimiters = {x: _DelimiterToken(x) for x in ['{', '}', ':']}
 
         self._left_brace = self._delimiters['{']
         self._right_brace = self._delimiters['}']
@@ -121,7 +118,7 @@ class Processor:
 
         # We also want additional escape sequences for all the delimiter
         # tokens.
-        self._escapes.update(dict((x, x) for x in self._delimiters))
+        self._escapes.update({x: x for x in self._delimiters})
 
         # And another escape sequence for the definition prefix.
         self._escapes.update({self._definition_prefix:
@@ -266,7 +263,7 @@ class Processor:
                 continue
 
             repeat = False
-            for delim in set(self._delimiters) | set([self._escape_char]):
+            for delim in set(self._delimiters) | {self._escape_char}:
                 segments = chunk.partition(delim)
                 if segments[1] and (segments[0] or segments[2]):
                     input.push_back(*segments)
