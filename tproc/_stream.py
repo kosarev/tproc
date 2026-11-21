@@ -28,8 +28,11 @@ class Stream:
                 if chunk is _END:
                     return
 
-            if chunk:
-                yield chunk
+            # Empty strings and None values carry no data.
+            if chunk is None or (isinstance(chunk, str) and not chunk):
+                continue
+
+            yield chunk
 
     def push_back(self, *chunks: object) -> None:
         self._front.extend(reversed(chunks))

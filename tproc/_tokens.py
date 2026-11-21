@@ -19,8 +19,11 @@ class TokenBase:
 
 # Class for delimiters, such as curly braces.
 class DelimiterToken(TokenBase):
-    def __init__(self, literal: str) -> None:
+    def __init__(self, literal: str, line: int | None = None) -> None:
         super().__init__('delimiter', literal)
+
+        # The source line the delimiter comes from, if known.
+        self.line = line
 
 
 # Represents tokens that should be treated as literal data. The content may or
@@ -32,6 +35,10 @@ class LiteralToken(TokenBase):
 
 # Designates invocations of fields to expand and replace.
 class ReplacementField(TokenBase):
-    def __init__(self, content: list[TokenBase]) -> None:
+    def __init__(self, content: list[TokenBase],
+                 line: int | None = None) -> None:
         super().__init__('field', content)
         self.tokens = content
+
+        # The source line of the opening brace, if known.
+        self.line = line

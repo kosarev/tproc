@@ -9,18 +9,47 @@
 import sys
 
 
-# Auxiliary Processor-related error info.
+# Formats a source location for diagnostics.
+def format_location(source: str | None, line: int | None) -> str | None:
+    if source is None:
+        return None
+    if line is None:
+        return source
+    return f'{source}:{line}'
+
+
+# Raised on malformed inputs, such as unbalanced braces or unknown
+# escape sequences. The source and line, when known, refer to where
+# the problem is.
+class Error(Exception):
+    def __init__(self, message: str, source: str | None = None,
+                 line: int | None = None) -> None:
+        super().__init__(message, source, line)
+        self.message = message
+        self.source = source
+        self.line = line
+
+    def __str__(self) -> str:
+        location = format_location(self.source, self.line)
+        if location is None:
+            return self.message
+        return f'{location}: {self.message}'
+
+
+# Auxiliary Processor-related error info: the stack of files and
+# fields being processed when an exception occurred.
 class ErrorInfo:
     def __init__(self) -> None:
         self.files: list[str] = []
-        self.fields: list[str] = []
+        self.fields: list[tuple[str, str | None]] = []
 
     def report(self) -> None:
         for f in reversed(self.files):
             print(f"tproc: In file '{f}':", file=sys.stderr)
 
-        for f in reversed(self.fields):
-            print(f"tproc: In field '{f}':", file=sys.stderr)
+        for field, location in reversed(self.fields):
+            prefix = 'tproc' if location is None else location
+            print(f"{prefix}: In field '{field}':", file=sys.stderr)
 
 
 # Returns the error info attached to a given exception, attaching a

@@ -1,0 +1,14 @@
+
+Comments hide non-text chunks too.
+
+@main
+1{commented}2
+
+@
+def commented():
+    yield '{# '
+    yield 5
+    yield ' }'
+
+@expected
+12

@@ -1,0 +1,20 @@
+
+Formatted fields expand to literal tokens, so they can be passed as
+arguments and their content is not subject to further expansion.
+
+@
+def upper(body):
+    for token in body:
+        yield tproc.LiteralToken(token.content.upper())
+
+@braces
+\{x\}
+
+@main
+{upper::{title:*^9}} {braces:>6}
+
+@title
+abc
+
+@expected
+***ABC***    \{x\}

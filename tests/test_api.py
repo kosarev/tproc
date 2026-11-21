@@ -75,3 +75,14 @@ def test_include(tmp_path: pathlib.Path) -> None:
     p = tproc.Processor()
     p.process_file(tmp_path / 'main.tproc')
     assert expand(p) == 'AB'
+
+
+def test_falsy_values() -> None:
+    # Falsy non-text values are data too, but None values and empty
+    # strings are not.
+    p = tproc.Processor()
+    p.process_input(['@main\n', "{0}|{False}|{[]}|{None}|{''}|{nothing}\n",
+                     '@\n', 'def nothing():\n',
+                     '    yield None\n', "    yield ''\n"])
+    assert list(p.expand_field('main')) == [0, '|', False, '|', [], '|',
+                                            '|', '|']
