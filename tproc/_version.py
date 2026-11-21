@@ -6,4 +6,4 @@
 #
 #   Published under the MIT license.
 
-__version__ = '1.0a2'
+__version__ = '2.0.0'

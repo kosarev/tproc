@@ -1,0 +1,4 @@
+include CHANGELOG.md
+include tests/*.tproc
+include examples/*.tproc
+include examples/*.py
